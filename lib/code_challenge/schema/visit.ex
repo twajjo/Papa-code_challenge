@@ -10,7 +10,7 @@ defmodule CodeChallenge.Schema.Visit do
     field(:date, :utc_datetime)
     field(:minutes, :integer)
     field(:tasks, :string)
-    belongs_to(:user, User, foreign_key: :member_id)
+    belongs_to(:member, User, foreign_key: :member_id)
     has_one(:transaction, Transaction)
 
     timestamps([type: :utc_datetime_usec])
@@ -31,6 +31,14 @@ defmodule CodeChallenge.Schema.Visit do
     item
     |> cast(attrs, @all_fields)
     |> validate_required(@required_fields)
+    |> validate_number(:minutes, greater_than: 0)
+    |> validate_change(:date, fn :date, %DateTime{} = date ->
+      if DateTime.compare(date, DateTime.utc_now()) == :gt do
+        []
+      else
+        [date: "must be in the future"]
+      end
+    end)
   end
 
   defdelegate update_changeset(mod_struct, map), to: __MODULE__, as: :changeset

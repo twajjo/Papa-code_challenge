@@ -8,18 +8,8 @@ defmodule CodeChallenge.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Start the Telemetry supervisor
-      CodeChallengeWeb.Telemetry,
       # Start the Ecto repository
-      CodeChallenge.Repo,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: CodeChallenge.PubSub},
-      # Start Finch
-      {Finch, name: CodeChallenge.Finch},
-      # Start the Endpoint (http/https)
-      CodeChallengeWeb.Endpoint
-      # Start a worker by calling: CodeChallenge.Worker.start_link(arg)
-      # {CodeChallenge.Worker, arg}
+      CodeChallenge.Repo
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -28,11 +18,8 @@ defmodule CodeChallenge.Application do
     Supervisor.start_link(children, opts)
   end
 
-  # Tell Phoenix to update the endpoint configuration
-  # whenever the application is updated.
   @impl true
-  def config_change(changed, _new, removed) do
-    CodeChallengeWeb.Endpoint.config_change(changed, removed)
+  def config_change(_changed, _new, _removed) do
     :ok
   end
 end

@@ -31,6 +31,7 @@ defmodule CodeChallenge.Schema.User do
     item
     |> cast(attrs, @all_fields)
     |> validate_required(@required_fields)
+    # TODO: validate email
   end
 
   defdelegate update_changeset(mod_struct, map), to: __MODULE__, as: :changeset
