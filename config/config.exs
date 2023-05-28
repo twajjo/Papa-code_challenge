@@ -10,6 +10,9 @@ import Config
 config :code_challenge,
   ecto_repos: [CodeChallenge.Repo]
 
+config :code_challenge,
+  default_starting_credits: 90
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

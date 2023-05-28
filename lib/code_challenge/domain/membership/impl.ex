@@ -25,34 +25,34 @@ defmodule CodeChallenge.Domain.Membership.Impl do
   end
 
   @impl true
-  def login(email) when is_binary(email) do
+  def login!(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
 
   @impl true
   def credit(%{id: nil} = pal, _visit), do: {:error, "Cannot reward credits to an unregistered pal #{inspect(pal)}"}
   def credit(%{email: email, credits: credits} = pal, %{minutes: to_credit} = visit) when is_integer(credits) and is_integer(to_credit) do
-    case login(email) do
-      {:ok, _} ->
+    case login!(email) do
+      %User{} ->
         new_balance = calculate_credit_balance(visit, to_credit, credits)
 
         pal
         |> update_balance(new_balance)
-      bad_news ->
-        bad_news
+      _ ->
+        {:error, "Invalid pal email (not found), cannot credit #{inspect(visit)} to #{inspect(pal)}."}
     end
   end
 
   @impl true
   def debit(%{id: nil} = member, _visit), do: {:error, "Cannot deduct credits from an unregistered member #{inspect(member)}"}
-  def debit(%{credits: credits, email: email} = member, %{minutes: to_debit}) when is_integer(credits) and is_integer(to_debit) do
-    case login(email) do
-      {:ok, _} ->
+  def debit(%{credits: credits, email: email} = member, %{minutes: to_debit} = visit) when is_integer(credits) and is_integer(to_debit) do
+    case login!(email) do
+      %User{} ->
         new_balance = calculate_debit_balance(member, to_debit, credits)
         member
         |> update_balance(new_balance)
-      bad_news ->
-        bad_news
+      _ ->
+        {:error, "Invalid member email (not found), cannot debit #{inspect(visit)} from #{inspect(member)}."}
     end
   end
 
@@ -84,31 +84,49 @@ defmodule CodeChallenge.Domain.Membership.Impl do
   end
 
   defp email_exists?(email) when is_binary(email) do
-    case login(email) do
-      {:ok, _} -> true
+    case login!(email) do
+      %User{} -> true
       _ -> false
     end
   end
   defp new_email_address?(email), do: !email_exists?(email)
 
-  defp store_if_new(false, _profile) do
-    {:error, "The specified email already has an account, please login to retrieve it."}
-  end
   defp store_if_new(true, profile) do
     store_profile(profile)
   end
+  defp store_if_new(false, _profile) do
+    {:error, "An account with the specified email already already exists, please  to retrieve it."}
+  end
 
   defp store_profile(profile) do
-    profile
-    |> User.changeset()
+    %User{}
+    |> User.changeset(profile |> prepare_profile())
     |> Repo.insert()
+  end
+
+  defp prepare_profile(%{credits: nil} = profile) do
+    credits = Application.get_env(:code_challenge, :default_starting_credits, 90)
+    profile
+    |> Map.from_struct()
+    |> Map.take(User.field_list())
+    |> Map.replace!(:credits, credits)
+  end
+  defp prepare_profile(%{credits: credits} = profile) when is_integer(credits) do
+    profile
+    |> Map.from_struct()
+    |> Map.take(User.field_list())
   end
 
   defp throw_on_the_floor(deduction), do: deduction
 
-  defp update_balance(member, new_balance) do
-    %{member | credits: new_balance}
-    |> User.changeset()
+  defp update_balance(%User{} = member, new_balance) do
+    member
+    |> User.changeset(%{(member |> Map.from_struct()) | credits: new_balance})
     |> Repo.update()
+  end
+
+  # Why, oh why, isn't struct written to handle PIPES!?
+  def better_struct(%{} = map, module) do
+    struct(module, map)
   end
 end

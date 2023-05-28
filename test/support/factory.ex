@@ -1,4 +1,4 @@
-defmodule CodeChallenge.Factory do
+defmodule CodeChallenge.Test.Support.Factory do
   use ExMachina.Ecto, repo: CodeChallenge.Repo
   import CodeChallenge.Test.Support.Utils
 

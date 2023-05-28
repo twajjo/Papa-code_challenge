@@ -20,22 +20,22 @@ defmodule CodeChallenge.Domain.DomainHook do
     @callback runtime_module() :: module()
   end
   defmacro __using__(_opts) do
-
-    env_key = __MODULE__
-      |> Module.split()
-      |> Enum.join()
-      |> Macro.underscore()
-    default = __MODULE__
-      |> Module.split()
-      |> List.insert_at(-1, "Impl")
-      |> Module.concat()
-
     quote do
       @behaviour CodeChallenge.Domain.DomainHook.API
 
       @impl true
       def runtime_module() do
-        Application.get_env(:code_challenge, unquote(env_key), unquote(default))
+        env_key = __MODULE__
+          |> Module.split()
+          |> List.insert_at(-1, "Impl")
+          |> Enum.join()
+          |> Macro.underscore()
+          |> String.to_atom()
+        default = __MODULE__
+          |> Module.split()
+          |> List.insert_at(-1, "Impl")
+          |> Module.concat()
+        Application.get_env(:code_challenge, env_key, default)
       end
       defoverridable runtime_module: 0
     end

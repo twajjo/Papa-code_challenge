@@ -13,5 +13,10 @@ config :code_challenge, CodeChallenge.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
+config :code_challenge,
+  code_challenge_domain_fulfillment_impl: CodeChallenge.Domain.Fulfillment.Mock,
+  code_challenge_domain_membership_impl: CodeChallenge.Domain.Membership.Mock,
+  code_challenge_domain_request_impl: CodeChallenge.Domain.Request.Mock
+
 # Print only warnings and errors during test
 config :logger, level: :warning

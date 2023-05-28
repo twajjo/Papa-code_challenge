@@ -11,22 +11,36 @@ defmodule CodeChallenge.Domain.Fulfillment.Impl do
 
   @impl true
   def fulfill(%User{id: nil} = pal, %Visit{}) do
-    {:error, "Unregistered users cannot fulfill Visit Requests #{inspect(pal)}"}
+    {:error, "Visit Requests cannot be fulfilled by unregistered pals #{inspect(pal)}"}
   end
   def fulfill(%User{id: pal_id}, %Visit{member_id: pal_id}) do
     {:error, "A pal may not fulfill their own visit requests"}
   end
-  def fulfill(%User{id: pal_id, email: email}, %Visit{id: visit_id, member_id: member_id}) do
-    case Membership.login(email) do
-      {:ok, _} ->
+  def fulfill(%User{id: pal_id, email: email} = pal, %Visit{id: visit_id, member: member, member_id: member_id} = visit) do
+    case Membership.login!(email) do
+      %User{} ->
+        Membership.credit(pal, visit)
+        Membership.debit(member, visit)
         %Transaction{member_id: member_id, pal_id: pal_id, visit_id: visit_id}
         |> Transaction.changeset()
-      bad_news ->
-        bad_news
+        |> Repo.insert()
+      _ ->
+        {:error, "Invalid pal email (not found), cannot fulfill #{inspect(visit)} by #{inspect(pal)}."}
     end
   end
-  def fulfill(%User{id: pal_id}, %{"id" => visit_id, "member_id" => member_id}) do
-    {:ok, %Transaction{member_id: member_id, pal_id: pal_id, visit_id: visit_id}}
+  def fulfill(%User{id: pal_id, email: email} = pal, %{"id" => visit_id, "member_id" => member_id} = visit) do
+    case Membership.login!(email) do
+      %User{} ->
+        member = User |> Repo.get(member_id)
+        visit = Visit |> Repo.get(visit_id)
+        Membership.credit(pal, visit)
+        Membership.debit(member, visit)
+        %Transaction{member_id: member_id, pal_id: pal_id, visit_id: visit_id}
+        |> Transaction.changeset()
+        |> Repo.insert()
+      _ ->
+        {:error, "Invalid pal email (not found), cannot fulfill #{inspect(visit)} by #{inspect(pal)}."}
+    end
   end
 
   @impl true

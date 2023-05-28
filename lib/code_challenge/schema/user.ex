@@ -26,6 +26,8 @@ defmodule CodeChallenge.Schema.User do
     )a
   @all_fields ~w()a ++ @required_fields ++ @optional_fields
 
+  def field_list(), do: @all_fields
+
   @spec changeset(%__MODULE__{} | %Ecto.Changeset{}, map) :: %Ecto.Changeset{}
   def changeset(item, attrs \\ %{}) do
     item

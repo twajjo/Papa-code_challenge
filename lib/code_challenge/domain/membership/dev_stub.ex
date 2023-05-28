@@ -17,8 +17,8 @@ defmodule CodeChallenge.Domain.Membership.DevStub do
   end
 
   @impl true
-  def login(email) when is_binary(email) do
-    {:ok, %User{first_name: "Maydup", last_name: "Name", email: email, credits: 90}}
+  def login!(email) when is_binary(email) do
+    %User{first_name: "Maydup", last_name: "Name", email: email, credits: 90}
   end
 
   @impl true
