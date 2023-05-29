@@ -9,7 +9,11 @@ defmodule CodeChallenge.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      docs: [
+        main: "CodeChallenge",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -37,6 +41,7 @@ defmodule CodeChallenge.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:timex, "~> 3.0"},
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false},
       {:faker, "~> 0.17", only: :test},
       {:ex_machina, "~> 2.4", only: :test},
       {:mox, "~> 1.0", only: :test}

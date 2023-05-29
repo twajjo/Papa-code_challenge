@@ -5,8 +5,18 @@ defmodule CodeChallenge.Domain.Request.API do
   alias CodeChallenge.Schema.{User, Visit}
 
   @doc """
+  Lists the visits fulfilled by the given valid user.
+
+  Parameters
+
+    user - a valid user in the system.
+
+  Returns
+
+    {:ok, list} - where list is the list of visits the pal has fulfilled.
+    {:error, message} - where message describes the reason the list could not be returned.
   """
-  @callback fulfilled(member :: %User{}) :: {:ok, list()} | {:error, %Ecto.Changeset{} | String.t()}
+  @callback fulfilled(pal :: %User{}) :: {:ok, list()} | {:error, %Ecto.Changeset{} | String.t()}
 
   @doc """
   List all fulfilled visits.
