@@ -16,12 +16,30 @@
 
   * Run `mix test` to run the unit tests.
 
-  There will be a number of warnings issued as the unit tests are run to describe missing requirements when dealing with Transaction 
-  fulfillment and can be ignored, although their meaning is described below under Design Decisions and Assumptions
-
 ## Usage and Examples
 
-  # API Description
+  ### Domain Concept
+
+  * Swappable at runtime
+  * Great for unit test mocking (Mock)
+  * Great for getting a "happy path" implementation running quickly for prototyping (DevStub)
+  * Great for A/B testing in production.
+
+  ### API Description
+
+  The API uses three different domains to govern the business logic of the challenge, each one focuses on managing one of the 3 schema models, but interoperates with all models and sometimes with each other.
+
+  * Membership domain, responsible for creating, authenticating, managing and listing users (members and pals) and updating the data in User schema models and the database.
+  * Request domain, responsible for creating, managing and fetching visits.
+  * Fulfillment domain, responsible
+
+  #### Membership Domain and API
+
+  #### Request Domain and API
+
+  #### Fulfillment Domain and API
+
+  ### Test Drive
 
   run `iex -S mix` to get the project dependencies.
 
@@ -37,20 +55,3 @@ Assumptions
 
   * Domains and Business Logic (substitutable at runtime)
   * Early release of DevStubs for integration testing by consumers of the API.
-
-To start your Phoenix server:
-
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
-
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix

@@ -38,8 +38,11 @@ defmodule CodeChallenge.Domain.Request.Impl do
   def available(%User{id: pal_id, email: email} = pal) do
     case Membership.login!(email) do
       %User{} ->
-        from(v in Visit, as: :visit, where: v.member_id != ^pal_id and not exists(from t in Transaction, where: t.visit_id == parent_as(:visit).id))
-        |> Repo.all(preload: [:member])
+        {
+          :ok,
+          from(v in Visit, as: :visit, where: v.member_id != ^pal_id and not exists(from t in Transaction, where: t.visit_id == parent_as(:visit).id))
+            |> Repo.all(preload: [:member])
+        }
       _ ->
         {:error, "Invalid pal email (not found), cannot fetch list of visits for #{inspect(pal)} to fulfill."}
     end
@@ -58,8 +61,12 @@ defmodule CodeChallenge.Domain.Request.Impl do
   def outstanding(%User{id: member_id, email: email} = member) do
     case Membership.login!(email) do
       %User{} ->
-        from(v in Visit, where: v.member_id == ^member_id)
-        |> Repo.all(preload: [:member])
+        transacted_visits = from t in Transaction, select: %{visit_id: t.visit_id}
+        {
+          :ok,
+          from(v in Visit, where: v.member_id == ^member_id and v.id not in subquery(transacted_visits))
+          |> Repo.all(preload: [:member])
+        }
       _ ->
         {:error, "Invalid member email (not found), cannot fetch list of unfulfilled visits requested by #{inspect(member)}."}
     end
@@ -97,13 +104,13 @@ defmodule CodeChallenge.Domain.Request.Impl do
   # Privates
 
   defp new_visit(%User{id: member_id}, %{date: date, minutes: minutes, tasks: tasks}) do
-    %Visit{member_id: member_id, date: date, minutes: minutes, tasks: tasks}
-    |> Visit.changeset()
+    %Visit{}
+    |> Visit.changeset(%{member_id: member_id, date: date, minutes: minutes, tasks: tasks})
     |> Repo.insert(preload: [:member])
   end
   defp new_visit(%User{id: member_id}, %{date: date, minutes: minutes}) do
-    %Visit{member_id: member_id, date: date, minutes: minutes}
-    |> Visit.changeset()
+    %Visit{}
+    |> Visit.changeset(%{member_id: member_id, date: date, minutes: minutes})
     |> Repo.insert(preload: [:member])
   end
 end

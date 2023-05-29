@@ -8,7 +8,7 @@ defmodule CodeChallenge.Test.Support.Factory.User do
           id: generate_id(),
           first_name: Faker.Lorem.word() |> String.slice(0..20),
           last_name: Faker.Lorem.word() |> String.slice(0..20),
-          email: "#{Faker.Lorem.word() |> String.slice(0..20)}@#{Faker.Lorem.word() |> String.slice(0..20)}.com",
+          email: "#{Faker.Lorem.word() |> String.slice(0..20)}.#{Faker.Lorem.word() |> String.slice(0..20)}@#{Faker.Lorem.word() |> String.slice(0..20)}.com",
           credits: 90
         }
       end

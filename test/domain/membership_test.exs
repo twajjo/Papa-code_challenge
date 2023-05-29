@@ -7,7 +7,7 @@ defmodule CodeChallenge.Domain.Membership.Test do
 
   alias CodeChallenge.Repo
 
-  alias CodeChallenge.Schema.{User, Visit}
+  alias CodeChallenge.Schema.User
 
   @membership_domain CodeChallenge.Domain.Membership.Impl
 

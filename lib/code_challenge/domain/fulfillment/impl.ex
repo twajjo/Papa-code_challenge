@@ -16,14 +16,18 @@ defmodule CodeChallenge.Domain.Fulfillment.Impl do
   def fulfill(%User{id: pal_id}, %Visit{member_id: pal_id}) do
     {:error, "A pal may not fulfill their own visit requests"}
   end
-  def fulfill(%User{id: pal_id, email: email} = pal, %Visit{id: visit_id, member: member, member_id: member_id} = visit) do
+  def fulfill(%User{id: pal_id, email: email} = pal, %Visit{id: visit_id, member_id: member_id} = visit) do
     case Membership.login!(email) do
       %User{} ->
-        Membership.credit(pal, visit)
-        Membership.debit(member, visit)
-        %Transaction{member_id: member_id, pal_id: pal_id, visit_id: visit_id}
-        |> Transaction.changeset()
-        |> Repo.insert()
+        case %Transaction{member_id: member_id, pal_id: pal_id, visit_id: visit_id} |> create_transaction() do
+          {:ok, _} = positive ->
+            member = User |> Repo.get(member_id)
+            visit = Visit |> Repo.get(visit_id)
+            apply_credits(visit, member, pal)
+            positive
+          negative ->
+            negative
+        end
       _ ->
         {:error, "Invalid pal email (not found), cannot fulfill #{inspect(visit)} by #{inspect(pal)}."}
     end
@@ -31,13 +35,15 @@ defmodule CodeChallenge.Domain.Fulfillment.Impl do
   def fulfill(%User{id: pal_id, email: email} = pal, %{"id" => visit_id, "member_id" => member_id} = visit) do
     case Membership.login!(email) do
       %User{} ->
-        member = User |> Repo.get(member_id)
-        visit = Visit |> Repo.get(visit_id)
-        Membership.credit(pal, visit)
-        Membership.debit(member, visit)
-        %Transaction{member_id: member_id, pal_id: pal_id, visit_id: visit_id}
-        |> Transaction.changeset()
-        |> Repo.insert()
+        case %Transaction{member_id: member_id, pal_id: pal_id, visit_id: visit_id} |> create_transaction() do
+          {:ok, _} = positive ->
+            member = User |> Repo.get(member_id)
+            visit = Visit |> Repo.get(visit_id)
+            apply_credits(visit, member, pal)
+            positive
+          negative ->
+            negative
+        end
       _ ->
         {:error, "Invalid pal email (not found), cannot fulfill #{inspect(visit)} by #{inspect(pal)}."}
     end
@@ -64,6 +70,28 @@ defmodule CodeChallenge.Domain.Fulfillment.Impl do
   end
 
   # Privates
+
+  defp apply_credits(visit, member, pal) do
+    require Logger
+    case Membership.credit(pal, visit) do
+      {:error, message} = error ->
+        Logger.error("Possible data integrity issue -> #{inspect(message)} cannot credit #{inspect(pal)} for visit #{inspect(visit)}")
+        error
+      ok -> ok
+    end
+    case Membership.debit(member, visit) do
+      {:error, message} = error ->
+        Logger.error("Possible data integrity issue -> #{inspect(message)} cannot debit #{inspect(member)} for visit #{inspect(visit)}")
+        error
+      ok -> ok
+    end
+  end
+
+  defp create_transaction(transaction) do
+    transaction
+    |> Transaction.changeset()
+    |> Repo.insert()
+  end
 
   defp member_transactions(member_id) do
     from t in Transaction, where: t.member_id == ^member_id

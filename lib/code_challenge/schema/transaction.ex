@@ -26,6 +26,7 @@ defmodule CodeChallenge.Schema.Transaction do
     item
     |> cast(attrs, @all_fields)
     |> validate_required(@required_fields)
+    |> unique_constraint(:visit_id)
   end
 
   defdelegate update_changeset(mod_struct, map), to: __MODULE__, as: :changeset

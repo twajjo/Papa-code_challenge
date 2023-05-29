@@ -33,10 +33,11 @@ defmodule CodeChallenge.Schema.Visit do
     |> validate_required(@required_fields)
     |> validate_number(:minutes, greater_than: 0)
     |> validate_change(:date, fn :date, %DateTime{} = date ->
-      if DateTime.compare(date, DateTime.utc_now()) == :gt do
+      # TODO: make future date minimum (now 1 day) configurable
+      if DateTime.compare(date, (DateTime.utc_now() |> Timex.add(Timex.Duration.from_days(1)) |> DateTime.truncate(:second))) == :gt do
         []
       else
-        [date: "must be in the future"]
+        [date: "must be tomorrow or later"]
       end
     end)
   end

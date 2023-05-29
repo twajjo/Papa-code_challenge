@@ -14,7 +14,7 @@ defmodule CodeChallenge.Domain.Membership do
   def login!(email), do: runtime_module().login!(email)
 
   @impl true
-  def credit(pal, visit), do: runtime_module().debit(pal, visit)
+  def credit(pal, visit), do: runtime_module().credit(pal, visit)
 
   @impl true
   def debit(member, visit), do: runtime_module().debit(member, visit)

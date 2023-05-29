@@ -5,6 +5,7 @@ defmodule CodeChallenge.Test.Support.FactoryHelpers do
   import CodeChallenge.Test.Support.Factory
 
   def fulfill(_exclusions, _visits, %User{}, 0), do: []
+  def fulfill(_exclusions, [], %User{}, _remaining), do: []
   def fulfill(exclusions, visits, %User{id: pal_id} = pal, how_many) do
     %Visit{id: visit_id, member_id: member_id} = visit = visits |> Enum.random()
     if exclusions
@@ -16,7 +17,7 @@ defmodule CodeChallenge.Test.Support.FactoryHelpers do
       [] ++
       fulfill(exclusions, visits |> List.delete(visit), pal, how_many)
     else
-      [insert(:transaction, visit_id: visit_id, pal_id: pal_id)] ++
+      [insert(:transaction, visit_id: visit_id, pal_id: pal_id, member_id: member_id)] ++
         fulfill(exclusions, visits |> List.delete(visit), pal, how_many - 1)
     end
   end
