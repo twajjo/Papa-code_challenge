@@ -60,6 +60,8 @@ If you do not have docker installed, you will need to install postgres.  If this
   * Run `mix help docs` to generate the full ExDoc for the Code Challenge.
 
   #### Membership Domain and API Summary
+  
+  For the purposes of the following service descriptions, the terms user, member and pal can be used interchangeably, but are referred to by the different names to provide context.
 
   The Membership domain manages Users and has the following functions in its interface:
 
