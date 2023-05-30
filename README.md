@@ -34,7 +34,7 @@ If you do not have docker installed, you will need to install postgres.  If this
   
   Domains are essentially services governing a particular problem space and have a specific contract (API) governed by @callbacks.  Domain implementations can be interdependent with one another (they are just modules after all without state, ordinarilly).  Each domain is meant to field the essential use case of "I (domain x) don't know how to create a model y, can someone else do this?  Each domain provides a catalogue of services through its @callbacks.
 
-  Domains are governed by 3 (or more) nodules to support a flexible service layer to provide the key benevits of an abstracted layer:
+  Domains are governed by 3 (or more) nodules to support a flexible service business logic abstraction layer to provide the key benevits of a domain:
 
   * An API module for adherence and compatibility.
   * An Interface module that determines the proper runtime implementation and delegates to it.  Note that the Interface adheres to the API behaviour.
@@ -189,14 +189,11 @@ If you do not have docker installed, you will need to install postgres.  If this
 
   Let's create an initial user or two to try things out (the module path names for the domain interfaces have been address through aliases in `.iex.exs`):
   
-  `
-  iex> {:ok, user1} = Membership.join(%User{first_name: "Erste", last_name: "Laste", email: "throckmorton.jones@rodney.com")
-  iex> {:ok, user2} = Membership.join(%User{first_name: "Fritz", last_name: "Latz", email: "an.email@valid.com")
-  `
+  - `iex> {:ok, user1} = Membership.join(%User{first_name: "Erste", last_name: "Laste", email: "throckmorton.jones@rodney.com")`
+  - `iex> {:ok, user2} = Membership.join(%User{first_name: "Fritz", last_name: "Latz", email: "an.email@valid.com")`
+
   We can repeat these steps as many times for as many new users as we wish.  Once there are a few users in the system, we can list them with:
-  `
-  iex> Membership.members!()
-  `
+  - `iex> Membership.members!()`
 
 ## Design Decisions and Assumptions
 
