@@ -187,6 +187,10 @@ If you do not have docker installed, you will need to install postgres.  If this
 
   * Run `iex -S mix` to start iex and try the system out.
 
+  Let's create an initial user or two to try things out (the module path names for the domain interfaces have been address through aliases in `.iex.exs`):
+  
+  `iex> Membership.join!(%User{first_name: "Erste", last_name: "Laste", email: "throckmorton.jones@rodney.com")
+
 ## Design Decisions and Assumptions
 
 ### Assumptions and issues
