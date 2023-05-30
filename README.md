@@ -46,6 +46,7 @@ If you do not have docker installed, you will need to install postgres.  If this
   * Great for unit test mocking (Mox).
   * Great for getting a "happy path" implementation running quickly for prototyping (DevStub)
   * Great for A/B testing in production.
+  * Domains can service different "head ends", such as web controllers, RESTful APIs, Absinthe resolvers for GraphQL, back end batch processing, etc.
 
   ### API Description
 
