@@ -31,8 +31,10 @@ If you do not have docker installed, you will need to install postgres.  If this
   ### Domain Concept
 
   Domains are the areas of the model layer (in MV,MVC,MC,etc. division of responsibilities) that do not contain the physical model or schema itself but manage the business logic surrounding the model objects.
+  
+  Domains are essentially services governing a particular problem space and have a specific contract (API) governed by @callbacks.  Domain implementations can be interdependent with one another (they are just modules after all without state, ordinarilly).  Each domain is meant to field the essential use case of "I (domain x) don't know how to create a model y, can someone else do this?  Each domain provides a catalogue of services through its @callbacks.
 
-  Domains consist of 3 (or more) things:
+  Domains are governed by 3 (or more) nodules to support a flexible service layer to provide the key benevits of an abstracted layer:
 
   * An API module for adherence and compatibility.
   * An Interface module that determines the proper runtime implementation and delegates to it.  Note that the Interface adheres to the API behaviour.
