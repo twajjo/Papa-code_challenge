@@ -189,7 +189,14 @@ If you do not have docker installed, you will need to install postgres.  If this
 
   Let's create an initial user or two to try things out (the module path names for the domain interfaces have been address through aliases in `.iex.exs`):
   
-  `iex> Membership.join!(%User{first_name: "Erste", last_name: "Laste", email: "throckmorton.jones@rodney.com")
+  `
+  iex> {:ok, user1} = Membership.join(%User{first_name: "Erste", last_name: "Laste", email: "throckmorton.jones@rodney.com")
+  iex> {:ok, user2} = Membership.join(%User{first_name: "Fritz", last_name: "Latz", email: "an.email@valid.com")
+  `
+  We can repeat these steps as many times for as many new users as we wish.  Once there are a few users in the system, we can list them with:
+  `
+  iex> Membership.members!()
+  `
 
 ## Design Decisions and Assumptions
 
